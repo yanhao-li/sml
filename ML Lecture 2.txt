@@ -1,0 +1,149 @@
+~/Desktop (501\)% sml
+Standard ML of New Jersey (64-bit) v110.94 [built: Fri Nov 01 16:08:14 2019]
+- (* Remember to put this at the top of your ML assignment file *)
+- Control.Print.printDepth := 100;
+- Control.Print.printLength := 100;
+
+
+- (* Writing a function that takes a tuple as a parameter *)
+- fun f (x,y) = x + y ; (* One parameter, that is a tuple *)
+val f = fn : int * int -> int
+- f (3,4);
+val it = 7 : int
+
+- (* You can also use patterns to define variables *)
+- val (a,b) = (5,6+7) ;
+val a = 5 : int
+val b = 13 : int
+- val (x::xs) = [1,2,3,4] ;
+stdIn:6.5-6.24 Warning: binding not exhaustive
+          x :: xs = ...
+val x = 1 : int
+val xs = [2,3,4] : int list
+- fun g x = (x, x+1) ;
+val g = fn : int -> int * int
+- val (y,z) = g 3 ;
+val y = 3 : int
+val z = 4 : int
+
+- (* ML has a LET construct for defining a nested scope *)
+- fun f x =
+=    let val y = x + 1
+=        val z = y * 2
+=    in  y * z
+=    end ;
+val f = fn : int -> int
+- f 4;
+val it = 50 : int
+
+- (* What about a nested recursive function? Use "fun" as usual. *)
+- let fun f 0 = 1
+=      |  f x = x * f (x-1)
+= in f 4
+= end ;
+val it = 24 : int
+
+(* For mutually recursive functions, you need LET and AND: *)
+- let fun f 0 = 1
+=      |  f x = x * g (x-1)
+=     and g 0 = 1
+=      |  g y = y * f (y-1)
+= in
+=   g 4
+= end ;
+val it = 24 : int
+
+- (* You get a warning when your patterns are not exhaustive *)
+- fun f [x] = x
+=  |  f (x::xs) = x + f xs 
+= ;
+stdIn:30.5-31.25 Warning: match nonexhaustive
+          x :: nil => ...
+          x :: xs => ...
+  
+val f = fn : int list -> int
+
+- (* A type is a set of values *)
+- (* In ML, you can define your own types -- by enumerating the values in the set *)
+- datatype stoplight = red | green | yellow ;
+datatype stoplight = green | red | yellow
+- green ;
+val it = green : stoplight
+- (* green is not part of any other type, other than stoplight *)
+
+- (* You can use these values as patterns *)
+- fun drive green = "Go"
+=  |  drive red = "Stop"
+=  |  drive yellow = "Go faster" ;
+val drive = fn : stoplight -> string
+- drive red ;
+val it = "Stop" : string
+- drive yellow ;
+val it = "Go faster" : string
+
+- (* You can define a type whose elements are composite values -- composed from other types *)
+- datatype tree = leaf of int | node of tree * tree  ;
+datatype tree = leaf of int | node of tree * tree
+- leaf 6 ;
+val it = leaf 6 : tree
+- node (leaf 5, leaf 7) ;
+val it = node (leaf 5,leaf 7) : tree
+
+- val myTree = node (node (leaf 5, leaf 6), leaf 7) ;
+val myTree = node (node (leaf 5,leaf 6),leaf 7) : tree
+- (* computing the fringe of a tree:  list of integers at the leaves *)
+- fun fringe (leaf x) = [x]  (* need to return the list containing x *)
+=  |  fringe (node (left,right)) = fringe left @ fringe right ;
+val fringe = fn : tree -> int list
+-  fringe myTree;
+val it = [5,6,7] : int list
+
+
+- (* To define a tree type with strings at the leaves, I have to repeat the
+=    previous definition, replacing int with string *)
+- datatype stringtree = leaf of string | node of stringtree * stringtree ;
+datatype stringtree = leaf of string | node of stringtree * stringtree
+- (* Instead, define a "polymorphic datatype", that is, where the definition
+=    of the type contains a type parameter *)
+- datatype 'a tree = leaf of 'a | node of 'a tree * 'a tree  (* 'a is the type parameter *)
+= ;
+datatype 'a tree = leaf of 'a | node of 'a tree * 'a tree
+- leaf 5 ;  (* compiler will infer this is an int tree *)
+val it = leaf 5 : int tree
+- leaf "hello" ;  (* string tree here *)
+val it = leaf "hello" : string tree
+- (* Polymorphic datatypes work well with polymorphic constructors *)
+- fun fringe (leaf x) = [x]  (* need to return the list containing x *)
+=  |  fringe (node (left,right)) = fringe left @ fringe right ;
+val fringe = fn : 'a tree -> 'a list
+- fringe (node (leaf "hello", node (leaf "one", leaf "two"))) ;
+val it = ["hello","one","two"] : string list
+
+- (* You can define your own infix operators *)
+- infix ++   (*tells the compiler you're adding new syntax, an infix operator ++ *) ;
+infix ++
+- fun x ++ y = (x+1)*y ;
+val ++ = fn : int * int -> int
+- 3 ++ 4 ;
+val it = 16 : int
+- (* You can pass infix operators as parameters: An infix is function that takes a tuple 
+=    of two values as input and returns a value *)
+- fun f (op +) a = a + a ;
+val f = fn : ('a * 'a -> 'b) -> 'a -> 'b
+- fun g (a,b) = (a*2)+b ;
+val g = fn : int * int -> int
+- f g 7 ;
+val it = 21 : int
+
+- (* Using a LAMBDA:  fn x => .... *)
+- map (fn y => y*2) [3,4,5,6];
+val it = [6,8,10,12] : int list
+- f (fn (x,y) => x*y) 3;
+val it = 9 : int
+
+- (* Passing in an infix operator as an actual parameter *)
+- fun h f = f(3,3) ;
+val h = fn : (int * int -> 'a) -> 'a
+- h (op * ) ;
+val it = 9 : int
+

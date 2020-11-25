@@ -1,0 +1,147 @@
+(501\)% sml
+Standard ML of New Jersey (64-bit) v110.94 [built: Fri Nov 01 16:08:14 2019]
+- (* This is a comment *)
+- (* Basic types: int, real, string *)
+- 4 ;
+val it = 4 : int
+-  (* The semicolon just tells the system that you're done typing. It is not part of
+=     the expression *)
+- 6.7 ;
+val it = 6.7 : real
+- "this is a string"
+= ;
+val it = "this is a string" : string
+- (* Defining variables *)
+- val x = 27 ;
+val x = 27 : int
+
+- (* Defining functions *)
+- fun f y = y * 2 ;
+val f = fn : int -> int
+- (* How about a real version of f *)
+- fun g z = z * 2.0 ;
+val g = fn : real -> real
+- fun f x = x + x ;
+val f = fn : int -> int
+- fun g (y:real) = y + y ;
+val g = fn : real -> real
+- fun g y = y  + y + 0.0 ;
+val g = fn : real -> real
+
+- (* Function definitions with multiple parameters are "curried".  That is, a function
+=    that takes two parameters is actually a function that takes one parameter and 
+=    returns a function that takes the second parameter and produces the result *)
+- fun foo x y = x + y ; (* foo x returns a function taking y and returning x + y *)
+val foo = fn : int -> int -> int
+- (* call foo with both parameter *)
+- foo 7 8 ;
+val it = 15 : int
+- (* I can call foo with just one parameter *)
+- foo 7 ;
+val it = fn : int -> int
+- val bar = foo 7 ;
+val bar = fn : int -> int
+- bar 8 ;
+val it = 15 : int
+
+- (* Function definitions use a nice equational style, using pattern matching *)
+- fun fac 0 = 1
+=  |  fac x = x * fac (x-1)
+= ;
+val fac = fn : int -> int
+- (* Here's an error *)
+- fun gac 0 = 1
+=  |  gac x = x * gac (x-1.0) ;
+stdIn:35.22-35.27 Error: operator and operand do not agree [overload conflict]
+  operator domain: [- ty] * [- ty]
+  operand:         [- ty] * real
+  in expression:
+    x - 1.0
+
+- (* Two aggregate types: lists and tuples *)
+- [1,2,3,4]  ;  (* list *)
+val it = [1,2,3,4] : int list
+- ["hello", "goodbye"] ;
+val it = ["hello","goodbye"] : string list
+- [[1,2,4], [8,9]] ;
+val it = [[1,2,4],[8,9]] : int list list
+- (* Lists must be homogeneous -- all elements must have the same type *)
+- [1,2,3.0] ;
+stdIn:40.1-40.10 Error: operator and operand do not agree [overload conflict]
+  operator domain: [int ty] * [int ty] list
+  operand:         [int ty] * real list
+  in expression:
+    2 :: 3.0 :: nil
+
+- (* Tuple: ordered collection of elements, of possibly different types *)
+- (3,4.0,"hello") ;
+val it = (3,4.0,"hello") : int * real * string
+
+- (* CONS in ML is written :: *)
+- 3::[4,5,6];
+val it = [3,4,5,6] : int list
+- (* CAR can be written as hd *)
+- hd [3,4,5,6];
+val it = 3 : int
+- (* CDR can be writen as tl *)
+- tl [3,4,5,6];
+val it = [4,5,6] : int list
+
+- (* In practice, hd and tl are seldom used -- PATTERN MATCHING is used instead! *)
+- (* Summing the elements of an int list *)
+- fun sum [] = 0
+=  |  sum (x::xs) = x + sum xs ;  (* x is the car, xs is the cdr in this case *) ;
+val sum = fn : int list -> int
+- sum [4,5,6,7] ;
+val it = 22 : int
+- (* Pattern matching is in top-to-bottom order *)
+- fun foo [] = 0
+=  |  foo [y] = y*2
+=  |  foo L = 100  ;
+val foo = fn : int list -> int
+- foo [3] ;
+val it = 6 : int
+
+- fun bar x y = if x = (y+1) then "yes" else "no" ;
+val bar = fn : int -> int -> string
+- (* pattern matching on tuples *)
+- fun f (x,y) = x + y ;
+val f = fn : int * int -> int
+- fun g (x:real,y) = x + y ;
+val g = fn : real * real -> real
+
+- (* Append is a built-in infix operator: @ *)
+- [1,2,3] @ [4,5,6] ;
+val it = [1,2,3,4,5,6] : int list
+- (* Length *)
+- length [1,2,3,4] ;
+val it = 4 : int
+- (* Here's the definition of length -- it is polymorphic. See lecture notes *)
+- fun length [] = 0
+=  |  length (y::ys) = 1 + length ys ;
+val length = fn : 'a list -> int
+- length ["a", "bc", "d" ];
+val it = 3 : int
+
+- (* defining our own append - also polymorphic *)
+- fun append [] L = L
+=  |  append (z::zs) L = z :: append zs L  ;
+val append = fn : 'a list -> 'a list -> 'a list
+
+- (* Of course, ML has higher-order functions *)
+- fun one f x y = f x y  ;   (* inferring f: 'a ->'b ->'c, x:'a , y:'b,  return type: 'c *) 
+val one = fn : ('a -> 'b -> 'c) -> 'a -> 'b -> 'c
+- fun sumPlusOne x y = x + y + 1 ;
+val sumPlusOne = fn : int -> int -> int
+- one sumPlusOne 3 4 ;
+val it = 8 : int
+- (* map is pre-defined as well *)
+- fun add1 x = x + 1 ;
+val add1 = fn : int -> int
+- map add1 [1,2,3] ;
+val it = [2,3,4] : int list
+- (* Here's the code for map, obviously polymorphic *)
+- fun map f [] = []
+=  |  map f (x::xs) = (f x) :: map f xs ;
+val map = fn : ('a -> 'b) -> 'a list -> 'b list
+
