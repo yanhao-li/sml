@@ -14,3 +14,7 @@ m [g x] => 'b list -> 'c
 
 fun foo g m x = [m [g x]]
 
+(* 2. *)
+fun bar x = 
+fn [] => []
+| (y::ys) => x * y :: bar x ys
