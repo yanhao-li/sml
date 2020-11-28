@@ -61,9 +61,7 @@ fun reduce f [] = raise reduce_error
 datatype 'a tree = leaf of 'a | node of 'a tree list
 
 (* 8 *)
-fun fringe (leaf x) = x
+fun fringe (leaf x) = [x]
 |   fringe (node []) = []
-|   fringe (node (c::cs)) = 
-  fringe c
-  @
-  map(fn y => fringe y) cs
+|   fringe (node [y]) = fringe y
+|   fringe (node (c::cs)) = fringe c @ reduce (fn x => fn y => x @ y) (map (fn y => fringe y) cs)
