@@ -22,9 +22,48 @@ fn [] => []
 (* 3 *)
 fun part x [] = ([], [])
 | part x (y::ys) = 
-  let
-    val (a, b) = part x ys
-  in 
-    if y < x then (y::a, b) else (a, y::b)
+  let val (a, b) = part x ys
+  in if y < x then (y::a, b) else (a, y::b)
   end
 
+(* 4 *)
+fun partSort [] = []
+|   partSort [y] = [y]
+|   partSort (x::xs) = 
+  let val (a, b) = part x xs
+  in partSort a @ [x] @ partSort b
+  end
+
+(* 5 *)
+fun pSort (op <) [] = []
+|   pSort (op <) [y] = [y]
+|   pSort (op <) (x::xs) =
+  let
+    fun part x [] = ([], [])
+    | part x (y::ys) =
+      let
+        val (a, b) = part x ys
+      in
+        if y < x then (y::a, b) else (a, y::b)
+      end
+    val (a, b) = part x xs
+  in
+    pSort (op <) a @ [x] @ pSort (op <) b
+  end
+
+(* 6 *)
+exception reduce_error
+fun reduce f [] = raise reduce_error
+|   reduce f [y] = y
+|   reduce f (x::xs) = f x (reduce f xs)
+
+(* 7 *)
+datatype 'a tree = leaf of 'a | node of 'a tree list
+
+(* 8 *)
+fun fringe (leaf x) = x
+|   fringe (node []) = []
+|   fringe (node (c::cs)) = 
+  fringe c
+  @
+  map(fn y => fringe y) cs
