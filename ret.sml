@@ -63,5 +63,10 @@ datatype 'a tree = leaf of 'a | node of 'a tree list
 (* 8 *)
 fun fringe (leaf x) = [x]
 |   fringe (node []) = []
-|   fringe (node [y]) = fringe y
-|   fringe (node (c::cs)) = fringe c @ reduce (fn x => fn y => x @ y) (map (fn y => fringe y) cs)
+|   fringe (node L) = reduce (fn x => fn y => x @ y) (map (fn x => fringe x) L)
+
+
+(* 9 *)
+(*fun sortTree (op <) (leaf L) = (leaf (pSort (op <) L))
+|   sortTree (op <) (node []) = (node [])
+|   sortTree (op <) (node (c::cs)) =  (node [sortTree (op <) c] :: cs)*)
