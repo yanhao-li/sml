@@ -65,8 +65,14 @@ fun fringe (leaf x) = [x]
 |   fringe (node []) = []
 |   fringe (node L) = reduce (fn x => fn y => x @ y) (map (fn x => fringe x) L)
 
-
 (* 9 *)
-(*fun sortTree (op <) (leaf L) = (leaf (pSort (op <) L))
+fun sortTree (op <) (leaf L) = (leaf (pSort (op <) L))
 |   sortTree (op <) (node []) = (node [])
-|   sortTree (op <) (node (c::cs)) =  (node [sortTree (op <) c] :: cs)*)
+|   sortTree (op <) (node L) = (node (map (fn n => sortTree (op <) n) L))
+
+(* 10 *)
+fun powerSet [] = [[]]
+|   powerSet (x::xs) = 
+let val p = powerSet xs
+in map (fn y => x::y) p @ p
+end
